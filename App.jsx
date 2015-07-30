@@ -24,7 +24,13 @@ App = React.createClass({
 
 	renderTasks () {
 		return this.data.tasks.map((task) => {
-			return <Task key={task._id} task={task} />;
+			const currentUserId = this.data.currentUser && this.data.currentUser._id;
+			const showPrivateButton = task.owner === currentUserId;
+
+			return <Task 
+			key={task._id} 
+			task={task} 
+			showPrivateButton={showPrivateButton} />;
 		});
 	},
 
@@ -33,12 +39,7 @@ App = React.createClass({
 
 		var text = React.findDOMNode(this.refs.textInput).value.trim();
 
-		Tasks.insert({
-			text: text,
-			createdAt: new Date(),
-			owner: Meteor.userId(),
-			username: Meteor.user().username
-		});
+		Meteor.call("addTask", text);
 
 		React.findDOMNode(this.refs.textInput).value="";
 	},
@@ -53,7 +54,7 @@ App = React.createClass({
 		return (
 			<div className="container">
 				<header>
-					<h1>Todo List ({this.data.incompleteCount})</h1>
+					<h1>Flame On! ({this.data.incompleteCount})</h1>
 
 					<label className="hide-completed">
 						<input 
